@@ -10,46 +10,46 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-/* Layout: 左に入力、右に机の上のA4用紙。朱肉の朱だけを差し色にする */
+/* Layout: 白地に細い線だけで区切る。色は請求書の印影だけに使う */
 :root {
-  --desk: #e4e8ea; --panel: #f5f7f8; --line: #c9d1d6; --field: #ffffff;
-  --ink: #1d2a32; --muted: #5a6b75; --shu: #c23a22; --shu-ink: #ffffff; --warn-bg: #fbe9e4;
+  --desk: #ffffff; --panel: transparent; --line: #dedede; --field: #ffffff;
+  --ink: #111111; --muted: #6f6f6f; --shu: #111111; --shu-ink: #ffffff; --warn: #b3261e; --warn-bg: #f7f7f7;
   --paper: #ffffff; --paper-ink: #1a1a1a; --paper-sub: #666666; --paper-line: #cccccc; --paper-band: #f0f0ee; --paper-seal: #cc0000;
   --sans: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', sans-serif;
   --mincho: 'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --desk: #151b1f; --panel: #1e262b; --line: #3a464d; --field: #151b1f; --ink: #e8edf0; --muted: #a0afb8; --shu: #e8644c; --shu-ink: #1a0f0c; --warn-bg: #3a211b; color-scheme: dark; }
+  :root:not([data-theme="light"]) { --desk: #141414; --panel: transparent; --line: #333333; --field: #141414; --ink: #f2f2f2; --muted: #9a9a9a; --shu: #f2f2f2; --shu-ink: #141414; --warn: #ff8a80; --warn-bg: #222222; color-scheme: dark; }
 }
-:root[data-theme="dark"] { --desk: #151b1f; --panel: #1e262b; --line: #3a464d; --field: #151b1f; --ink: #e8edf0; --muted: #a0afb8; --shu: #e8644c; --shu-ink: #1a0f0c; --warn-bg: #3a211b; color-scheme: dark; }
+:root[data-theme="dark"] { --desk: #141414; --panel: transparent; --line: #333333; --field: #141414; --ink: #f2f2f2; --muted: #9a9a9a; --shu: #f2f2f2; --shu-ink: #141414; --warn: #ff8a80; --warn-bg: #222222; color-scheme: dark; }
 
 * { box-sizing: border-box; }
 body { background: var(--desk); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 40px; }
 .app { max-width: 1120px; margin: 0 auto; display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr); }
-header h1 { font-family: var(--sans); font-weight: 500; font-size: 26px; letter-spacing: .04em; margin: 0; }
+header h1 { font-family: var(--sans); font-weight: 700; font-size: 22px; letter-spacing: .02em; margin: 0; }
 header p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
-.forms { display: grid; gap: 12px; min-width: 0; align-content: start; }
+.forms { display: grid; gap: 0; min-width: 0; align-content: start; }
 .sheet-col { display: grid; gap: 12px; min-width: 0; align-content: start; }
 @media (min-width: 920px) {
   .app { grid-template-columns: minmax(0, 420px) minmax(0, 1fr); }
   header { grid-column: 1 / -1; }
   .sheet-col { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
 }
-section, details { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: grid; gap: 12px; min-width: 0; }
+section, details { background: var(--panel); border-top: 1px solid var(--line); padding: 18px 0 22px; display: grid; gap: 12px; min-width: 0; }
 h2, summary { font-size: 14px; font-weight: 700; margin: 0; }
 summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 summary::-webkit-details-marker { display: none; }
 .s-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .s-title span { font-weight: 400; color: var(--muted); margin-left: 6px; }
-.toggle { flex-shrink: 0; border: 1px solid var(--line); border-radius: 4px; background: var(--field); font-size: 13px; font-weight: 500; padding: 4px 10px; white-space: nowrap; }
-.toggle::after { content: "開いて編集 ▾"; }
-details[open] .toggle::after { content: "閉じる ▴"; }
+.toggle { flex-shrink: 0; font-size: 13px; font-weight: 400; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+.toggle::after { content: "編集する"; }
+details[open] .toggle::after { content: "閉じる"; }
 details[open] summary { margin-bottom: 12px; }
 .fields { display: grid; gap: 10px; }
 .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
 label { display: block; font-size: 12.5px; color: var(--muted); min-width: 0; }
-label b { color: var(--shu); font-weight: 700; margin-left: 2px; }
-input, select { display: block; margin-top: 3px; width: 100%; min-width: 0; font: inherit; font-size: 16px; color: var(--ink); background: var(--field); border: 1px solid var(--line); border-radius: 4px; padding: 8px 9px; }
+label b { color: var(--muted); font-weight: 400; font-size: 11.5px; margin-left: 2px; }
+input, select { display: block; margin-top: 3px; width: 100%; min-width: 0; min-height: 43px; font: inherit; font-size: 16px; color: var(--ink); background: var(--field); border: 1px solid var(--line); border-radius: 2px; padding: 8px 9px; }
 input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--shu); outline-offset: 1px; }
 .hint { font-size: 12px; color: var(--muted); margin: 0; }
 .name-row { display: grid; grid-template-columns: minmax(0, 1fr) 84px; gap: 8px; }
@@ -57,23 +57,23 @@ input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-v
 .row:first-child { border-top: 0; padding-top: 0; }
 .row-head { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--muted); }
 .del { background: none; border: 0; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; padding: 2px 4px; }
-.add { background: none; border: 1px dashed var(--line); border-radius: 4px; color: var(--ink); font: inherit; padding: 9px; cursor: pointer; }
+.add { background: none; border: 1px solid var(--line); border-radius: 2px; color: var(--ink); font: inherit; padding: 9px; cursor: pointer; }
 .total { display: flex; justify-content: space-between; font-weight: 700; font-variant-numeric: tabular-nums; }
-.receipt-pick { display: block; text-align: center; border: 1px dashed var(--line); border-radius: 4px; color: var(--ink); font-size: 15px; padding: 9px; cursor: pointer; }
+.receipt-pick { display: block; text-align: center; border: 1px solid var(--line); border-radius: 2px; color: var(--ink); font-size: 15px; padding: 9px; cursor: pointer; }
 .receipt-pick input { position: absolute; width: 1px; height: 1px; opacity: 0; padding: 0; margin: 0; border: 0; }
 .receipt-pick:focus-within { outline: 2px solid var(--shu); outline-offset: 1px; }
 .receipts { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
 .receipts:empty { display: none; }
 .receipt { display: grid; gap: 2px; justify-items: center; min-width: 0; }
-.receipt img { width: 100%; height: 96px; object-fit: contain; background: var(--field); border: 1px solid var(--line); border-radius: 4px; }
-.flag { color: var(--shu); font-size: 12px; font-weight: 700; }
-.frame { background: var(--paper); box-shadow: 0 1px 3px rgba(20, 30, 36, .3); overflow: hidden; border-radius: 2px; position: relative; }
+.receipt img { width: 100%; height: 96px; object-fit: contain; background: var(--field); border: 1px solid var(--line); }
+.flag { color: var(--warn); font-size: 12px; font-weight: 700; }
+.frame { background: var(--paper); border: 1px solid var(--line); overflow: hidden; position: relative; }
 .frame-inner { transform-origin: top left; width: 794px; }
-.sample { position: absolute; top: 12px; left: 12px; z-index: 2; background: var(--shu); color: var(--shu-ink); font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 3px; }
-.save { width: 100%; background: var(--shu); color: var(--shu-ink); border: 0; border-radius: 6px; font: inherit; font-weight: 700; font-size: 16px; padding: 13px; cursor: pointer; }
-.save:disabled { opacity: .55; cursor: default; }
+.sample { position: absolute; top: 10px; left: 12px; z-index: 2; color: #6f6f6f; font-size: 12px; }
+.save { width: 100%; background: var(--shu); color: var(--shu-ink); border: 0; border-radius: 2px; font: inherit; font-weight: 700; font-size: 16px; padding: 13px; cursor: pointer; }
+.save:disabled { opacity: .3; cursor: default; }
 .status { margin: 0; font-size: 13px; }
-.status.bad { background: var(--warn-bg); padding: 8px 10px; border-radius: 4px; }
+.status.bad { color: var(--warn); background: var(--warn-bg); padding: 8px 10px; }
 .privacy { margin: 0; font-size: 12px; color: var(--muted); }
 
 /* 請求書本体：テーマに関係なく紙の色で固定する */
