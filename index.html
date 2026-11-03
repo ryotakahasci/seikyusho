@@ -86,7 +86,12 @@ input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-v
 .p-company { font-size: 18px; font-weight: 700; }
 .p-issuer { text-align: right; position: relative; font-size: 12px; min-width: 0; }
 .p-issuer-name { font-size: 15px; font-weight: 700; padding-right: 58px; min-height: 52px; }
-.p-seal { position: absolute; top: 0; right: 0; width: 48px; height: 48px; border: 2px solid var(--paper-seal); border-radius: 50%; color: var(--paper-seal); font-size: 16px; font-weight: 700; line-height: 1.1; display: flex; align-items: center; justify-content: center; text-align: center; }
+.p-seal { position: absolute; top: 0; right: 0; width: 48px; height: 48px; border: 2px solid var(--paper-seal); border-radius: 50%; color: var(--paper-seal); font-weight: 700; line-height: 1.05; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.p-seal span { display: block; }
+.p-seal.n1 { font-size: 24px; }
+.p-seal.n2 { font-size: 16px; }
+.p-seal.n3 { font-size: 13px; line-height: 1; }
+.p-seal.n4 { font-size: 14px; display: grid; grid-template-columns: auto auto; align-content: center; justify-content: center; column-gap: 1px; }
 .p-total { display: inline-block; border: 1px solid var(--paper-line); padding: 6px 22px; font-size: 18px; margin: 6px 0 20px; }
 .paper table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
 .paper th { background: var(--paper-band); font-weight: 400; font-size: 12px; text-align: right; padding: 7px 10px; border-bottom: 1px solid var(--paper-line); }
@@ -123,7 +128,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-v
         <label>建物名・部屋番号<input id="i-address2" placeholder="サンプルビル101"></label>
         <div class="two">
           <label>電話番号<input id="i-tel" type="tel" autocomplete="tel" placeholder="090-0000-0000"></label>
-          <label>印影の文字（2文字まで）<input id="i-seal" placeholder="山田"></label>
+          <label>印影の文字（4文字まで）<input id="i-seal" placeholder="山田"></label>
         </div>
         <label>メールアドレス<input id="i-email" type="email" autocomplete="email" placeholder="taro@example.com"></label>
         <label>銀行・支店 <b>必須</b><input id="i-bank1" placeholder="〇〇銀行　〇〇支店"></label>
@@ -265,7 +270,10 @@ function buildPaper(doc) {
   const { issuer: i, client: c, subject, date, due, items } = doc;
   const t = calcTotals(items);
   const clientName = c.honorific ? c.name + '　' + c.honorific : c.name;
-  const seal = Array.from(i.seal || '').slice(0, 2).map(esc).join('<br>');
+  const sealText = Array.from(i.seal || '').slice(0, 4);
+  // 4文字は印鑑の慣例どおり、右の列から上下に読む
+  const sealOrder = sealText.length === 4 ? [sealText[2], sealText[0], sealText[3], sealText[1]] : sealText;
+  const seal = sealOrder.map(c => `<span>${esc(c)}</span>`).join('');
   const lines = [i.zip, i.address1, i.address2, i.tel, i.email].filter(Boolean).map(l => `<div>${esc(l)}</div>`).join('');
   const rows = items.map(it => {
     const v = calcItem(it);
@@ -291,7 +299,7 @@ function buildPaper(doc) {
       <div class="p-issuer">
         <div class="p-issuer-name">${esc(i.name)}</div>
         ${lines}
-        ${seal ? `<div class="p-seal">${seal}</div>` : ''}
+        ${seal ? `<div class="p-seal n${sealText.length}">${seal}</div>` : ''}
       </div>
     </div>
     <div>下記をご請求申し上げます。</div>
@@ -323,7 +331,7 @@ function problems(doc) {
   if (!doc.items.some(i => i.name && i.amount > 0)) miss.push('品目と金額');
   const out = miss.length ? [miss.join('、') + 'を入力してください。'] : [];
   if (doc.issuer.invoice && !/^T\d{13}$/.test(doc.issuer.invoice.toUpperCase())) out.push('インボイス登録番号は「T＋13桁の数字」で入力してください。');
-  if (Array.from(doc.issuer.seal).length > 2) out.push('印影の文字は2文字までにしてください。');
+  if (Array.from(doc.issuer.seal).length > 4) out.push('印影の文字は4文字までにしてください。');
   return out;
 }
 
