@@ -123,7 +123,8 @@ input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-v
       <div class="fields">
         <p class="hint">住所や口座などの情報は、この端末のブラウザにだけ保存されます。サーバーには保存・送信されません。</p>
         <label>名前・屋号 <b>必須</b><input id="i-name" autocomplete="name" placeholder="山田　太郎"></label>
-        <label>郵便番号<input id="i-zip" autocomplete="postal-code" placeholder="〒100-0001"></label>
+        <label>郵便番号<input id="i-zip" autocomplete="postal-code" inputmode="numeric" placeholder="1000001"></label>
+        <p class="hint" id="zip-status">7桁入れると住所を自動で入力します。</p>
         <label>住所 <b>必須</b><input id="i-address1" placeholder="東京都千代田区千代田1-1"></label>
         <label>建物名・部屋番号<input id="i-address2" placeholder="サンプルビル101"></label>
         <div class="two">
@@ -151,7 +152,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-v
             <label>敬称<select id="c-honorific"><option>御中</option><option>様</option><option>宛</option><option value="">なし</option></select></label>
           </div>
         </div>
-        <label>住所<input id="c-address" placeholder="〒100-0000 東京都..."></label>
+        <label>住所<input id="c-address" placeholder="1000001 と入れると住所を自動入力"></label>
         <div class="two">
           <label>担当者名<input id="c-person" placeholder="田中様"></label>
           <label>電話番号<input id="c-tel" type="tel" placeholder="03-0000-0000"></label>
@@ -365,6 +366,60 @@ function refresh() {
 function setStatus(text, bad) {
   $('status').textContent = text;
   $('status').className = 'status' + (bad ? ' bad' : '');
+}
+
+// ===== 郵便番号 =====
+const zipCache = {};
+let autoAddress = '';
+
+function zipDigits(value) {
+  const half = value.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+  return half.replace(/[〒\s\-‐－ーｰ−]/g, '');
+}
+function formatZip(zip) { return '〒' + zip.slice(0, 3) + '-' + zip.slice(3); }
+async function lookupZip(zip) {
+  const head = zip.slice(0, 2);
+  if (!zipCache[head]) {
+    zipCache[head] = fetch('zip/' + head + '.json').then(r => {
+      if (r.status === 404) return {};
+      if (!r.ok) throw new Error('zip');
+      return r.json();
+    });
+    zipCache[head].catch(() => { delete zipCache[head]; });
+  }
+  return (await zipCache[head])[zip.slice(2)] || '';
+}
+async function fillIssuerAddress() {
+  const box = $('i-zip'), note = $('zip-status');
+  const zip = zipDigits(box.value);
+  if (!/^\d{7}$/.test(zip)) { note.textContent = '7桁入れると住所を自動で入力します。'; return; }
+  try {
+    const address = await lookupZip(zip);
+    if (zipDigits(box.value) !== zip) return;
+    if (!address) { note.textContent = 'この郵便番号の住所は見つかりませんでした。住所を直接入力してください。'; return; }
+    box.value = formatZip(zip);
+    const field = $('i-address1');
+    if (!field.value.trim() || field.value === autoAddress) {
+      field.value = address;
+      autoAddress = address;
+      note.textContent = '住所を入力しました。番地を続けて入力してください。';
+    } else {
+      note.textContent = '入力済みの住所はそのままにしています。変えるときは住所欄を空にしてください。';
+    }
+    refresh();
+  } catch (e) {
+    note.textContent = '住所を自動入力できませんでした。住所を直接入力してください。';
+  }
+}
+async function fillClientAddress() {
+  const box = $('c-address');
+  const raw = box.value.trim();
+  const zip = zipDigits(raw);
+  if (!/^[〒\d０-９\-‐－ーｰ−\s]+$/.test(raw) || !/^\d{7}$/.test(zip)) return;
+  try {
+    const address = await lookupZip(zip);
+    if (address && box.value.trim() === raw) { box.value = formatZip(zip) + ' ' + address; refresh(); }
+  } catch (e) { /* 手入力を続けられる */ }
 }
 
 // ===== 領収書 =====
@@ -648,6 +703,8 @@ function start() {
   document.querySelector('.forms').addEventListener('change', refresh);
   $('add-row').addEventListener('click', () => { addRow(); refresh(); });
   $('save').addEventListener('click', savePdf);
+  $('i-zip').addEventListener('input', fillIssuerAddress);
+  $('c-address').addEventListener('input', fillClientAddress);
   $('receipt-input').addEventListener('change', async e => {
     const files = Array.from(e.target.files);
     e.target.value = '';
