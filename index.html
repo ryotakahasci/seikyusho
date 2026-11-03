@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
+<meta name="color-scheme" content="light">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>請求書をつくる</title>
@@ -12,16 +13,13 @@
 <style>
 /* Layout: 白地に細い線だけで区切る。色は請求書の印影だけに使う */
 :root {
+  color-scheme: light;
   --desk: #ffffff; --panel: transparent; --line: #dedede; --field: #ffffff;
   --ink: #111111; --muted: #6f6f6f; --shu: #111111; --shu-ink: #ffffff; --warn: #b3261e; --warn-bg: #f7f7f7;
   --paper: #ffffff; --paper-ink: #1a1a1a; --paper-sub: #666666; --paper-line: #cccccc; --paper-band: #f0f0ee; --paper-seal: #cc0000;
   --sans: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', sans-serif;
   --mincho: 'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --desk: #141414; --panel: transparent; --line: #333333; --field: #141414; --ink: #f2f2f2; --muted: #9a9a9a; --shu: #f2f2f2; --shu-ink: #141414; --warn: #ff8a80; --warn-bg: #222222; color-scheme: dark; }
-}
-:root[data-theme="dark"] { --desk: #141414; --panel: transparent; --line: #333333; --field: #141414; --ink: #f2f2f2; --muted: #9a9a9a; --shu: #f2f2f2; --shu-ink: #141414; --warn: #ff8a80; --warn-bg: #222222; color-scheme: dark; }
 
 * { box-sizing: border-box; }
 body { background: var(--desk); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 40px; }
