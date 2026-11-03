@@ -32,6 +32,7 @@
 :root[data-palette="charcoal"] input, :root[data-palette="charcoal"] select, :root[data-palette="dusk"] input, :root[data-palette="dusk"] select { color-scheme: dark; }
 input::placeholder { color: var(--field-ink); opacity: .45; font-size: 13.5px; }
 
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 * { box-sizing: border-box; }
 body { background: var(--desk); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 40px; }
 .app { max-width: 1120px; margin: 0 auto; display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr); }
@@ -106,7 +107,8 @@ input[type="date"]::-webkit-date-and-time-value { text-align: left; min-width: 0
 .p-client { min-width: 0; }
 .p-company { font-size: 18px; font-weight: 700; }
 .p-issuer { text-align: right; position: relative; font-size: 12px; min-width: 0; }
-.p-issuer-name { font-size: 15px; font-weight: 700; padding-right: 58px; min-height: 52px; }
+.p-issuer-name { font-size: 15px; font-weight: 700; }
+.p-issuer-name.has-seal { padding-right: 58px; min-height: 52px; }
 .p-seal { position: absolute; top: 0; right: 0; width: 48px; height: 48px; border: 2px solid var(--paper-seal); border-radius: 50%; color: var(--paper-seal); font-weight: 700; line-height: 1.05; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
 .p-seal span { display: block; }
 .p-seal.n1 { font-size: 24px; }
@@ -324,7 +326,7 @@ function buildPaper(doc) {
         ${c.address ? `<div>${esc(c.address)}</div>` : ''}${c.person ? `<div>${esc(c.person)}</div>` : ''}${c.tel ? `<div>${esc(c.tel)}</div>` : ''}
       </div>
       <div class="p-issuer">
-        <div class="p-issuer-name">${esc(i.name)}</div>
+        <div class="p-issuer-name${seal ? ' has-seal' : ''}">${esc(i.name)}</div>
         ${lines}
         ${seal ? `<div class="p-seal n${sealText.length}">${seal}</div>` : ''}
       </div>
