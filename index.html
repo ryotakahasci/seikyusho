@@ -30,7 +30,7 @@
 :root[data-palette="vanilla"] { --desk: #F0DBBE; --field: #F4EEE6; --ink: #474249; --muted: #474249; --line: #474249; --shu: #474249; --shu-ink: #F0DBBE; }
 :root[data-palette="terracotta"] body { font-weight: 500; }
 :root[data-palette="charcoal"] input, :root[data-palette="charcoal"] select, :root[data-palette="dusk"] input, :root[data-palette="dusk"] select { color-scheme: dark; }
-input::placeholder { color: var(--field-ink); opacity: .55; }
+input::placeholder { color: var(--field-ink); opacity: .45; font-size: 13.5px; }
 
 * { box-sizing: border-box; }
 body { background: var(--desk); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 40px; }
@@ -64,7 +64,9 @@ details[open] summary { margin-bottom: 12px; }
 .fields { display: grid; gap: 10px; }
 .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
 label { display: block; font-size: 12.5px; color: var(--muted); min-width: 0; }
-label b { color: var(--muted); font-weight: 400; font-size: 11.5px; margin-left: 2px; }
+label b { display: inline-block; background: var(--ink); color: var(--desk); font-size: 10.5px; font-weight: 700; line-height: 1; padding: 3px 5px; margin-left: 4px; border-radius: 2px; vertical-align: 1px; }
+.row:not(:first-child) label b { display: none; }
+input.need, select.need { border: 2px solid var(--ink); padding: 7px 8px; }
 input, select { display: block; margin-top: 3px; width: 100%; min-width: 0; min-height: 43px; font: inherit; font-size: 16px; color: var(--field-ink); background: var(--field); border: 1px solid var(--line); border-radius: 2px; padding: 8px 9px; }
 input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--shu); outline-offset: 1px; }
 .hint { font-size: 12px; color: var(--muted); margin: 0; }
@@ -143,22 +145,22 @@ input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-v
       <summary><span class="s-title">自分の情報<span id="issuer-summary"></span></span><span class="toggle" aria-hidden="true"></span></summary>
       <div class="fields">
         <p class="hint">住所や口座などの情報は、この端末のブラウザにだけ保存されます。サーバーには保存・送信されません。</p>
-        <label>名前・屋号 <b>必須</b><input id="i-name" autocomplete="name" placeholder="山田　太郎"></label>
-        <label>郵便番号<input id="i-zip" autocomplete="postal-code" inputmode="numeric" placeholder="1000001"></label>
+        <label>名前・屋号 <b>必須</b><input id="i-name" data-required autocomplete="name" placeholder="例：山田　太郎"></label>
+        <label>郵便番号<input id="i-zip" autocomplete="postal-code" inputmode="numeric" placeholder="例：1000001"></label>
         <p class="hint" id="zip-status">7桁入れると住所を自動で入力します。</p>
-        <label>住所 <b>必須</b><input id="i-address1" placeholder="東京都千代田区千代田1-1"></label>
-        <label>建物名・部屋番号<input id="i-address2" placeholder="サンプルビル101"></label>
+        <label>住所 <b>必須</b><input id="i-address1" data-required placeholder="例：東京都千代田区千代田1-1"></label>
+        <label>建物名・部屋番号<input id="i-address2" placeholder="例：サンプルビル101"></label>
         <div class="two">
-          <label>電話番号<input id="i-tel" type="tel" autocomplete="tel" placeholder="090-0000-0000"></label>
-          <label>印影の文字（4文字まで）<input id="i-seal" placeholder="山田"></label>
+          <label>電話番号<input id="i-tel" type="tel" autocomplete="tel" placeholder="例：090-0000-0000"></label>
+          <label>印影の文字（4文字まで）<input id="i-seal" placeholder="例：山田"></label>
         </div>
-        <label>メールアドレス<input id="i-email" type="email" autocomplete="email" placeholder="taro@example.com"></label>
-        <label>銀行・支店 <b>必須</b><input id="i-bank1" placeholder="〇〇銀行　〇〇支店"></label>
+        <label>メールアドレス<input id="i-email" type="email" autocomplete="email" placeholder="例：taro@example.com"></label>
+        <label>銀行・支店 <b>必須</b><input id="i-bank1" data-required placeholder="例：〇〇銀行　〇〇支店"></label>
         <div class="two">
-          <label>口座種別・番号 <b>必須</b><input id="i-bank2" placeholder="（普）1234567"></label>
-          <label>口座名義 <b>必須</b><input id="i-bank3" placeholder="ヤマダ　タロウ"></label>
+          <label>口座種別・番号 <b>必須</b><input id="i-bank2" data-required placeholder="例：（普）1234567"></label>
+          <label>口座名義 <b>必須</b><input id="i-bank3" data-required placeholder="例：ヤマダ　タロウ"></label>
         </div>
-        <label>インボイス登録番号<input id="i-invoice" placeholder="T1234567890123" autocapitalize="characters"></label>
+        <label>インボイス登録番号<input id="i-invoice" placeholder="例：T1234567890123" autocapitalize="characters"></label>
         <p class="hint">空欄なら「インボイス事業者登録なし」と記載します。</p>
         <label>備考<input id="i-note"></label>
       </div>
@@ -169,14 +171,14 @@ input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-v
       <div class="fields">
         <div>
           <div class="name-row">
-            <label>宛名 <b>必須</b><input id="c-name" placeholder="株式会社サンプル"></label>
+            <label>宛名 <b>必須</b><input id="c-name" data-required placeholder="例：株式会社サンプル"></label>
             <label>敬称<select id="c-honorific"><option>御中</option><option>様</option><option>宛</option><option value="">なし</option></select></label>
           </div>
         </div>
-        <label>住所<input id="c-address" placeholder="1000001 と入れると住所を自動入力"></label>
+        <label>住所<input id="c-address" placeholder="例：1000001（7桁で住所を自動入力）"></label>
         <div class="two">
-          <label>担当者名<input id="c-person" placeholder="田中様"></label>
-          <label>電話番号<input id="c-tel" type="tel" placeholder="03-0000-0000"></label>
+          <label>担当者名<input id="c-person" placeholder="例：田中様"></label>
+          <label>電話番号<input id="c-tel" type="tel" placeholder="例：03-0000-0000"></label>
         </div>
       </div>
     </section>
@@ -184,9 +186,9 @@ input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-v
     <section>
       <h2>請求内容</h2>
       <div class="fields">
-        <label>件名 <b>必須</b><input id="d-subject" placeholder="2026年11月分 出演料"></label>
+        <label>件名 <b>必須</b><input id="d-subject" data-required placeholder="例：2026年11月分 出演料"></label>
         <div class="two">
-          <label>請求日 <b>必須</b><input id="d-date" type="date"></label>
+          <label>請求日 <b>必須</b><input id="d-date" data-required type="date"></label>
           <label>お支払期限<input id="d-due" type="date"></label>
         </div>
       </div>
@@ -250,14 +252,14 @@ function addRow(data) {
   row.className = 'row'; row.id = 'row-' + id;
   row.innerHTML = `
     <div class="row-head"><span>明細</span><button class="del" type="button" data-del="${id}">削除</button></div>
-    <label>品目<input id="r-name-${id}" list="item-names" placeholder="出演料"></label>
+    <label>品目 <b>必須</b><input id="r-name-${id}" data-required list="item-names" placeholder="例：出演料"></label>
     <div class="two">
-      <label>金額（円）<input id="r-amount-${id}" type="number" inputmode="numeric" min="0" placeholder="0"></label>
+      <label>金額（円） <b>必須</b><input id="r-amount-${id}" data-required type="number" inputmode="numeric" min="0" placeholder="例：0"></label>
       <label>税の扱い<select id="r-mode-${id}"><option value="in">税込（内税10%）</option><option value="ex">税抜（外税10%）</option><option value="none">立替・税なし</option></select></label>
     </div>
     <div class="two">
       <label>日付<input id="r-date-${id}" type="date"></label>
-      <label>メモ<input id="r-note-${id}" placeholder="渋谷→新宿"></label>
+      <label>メモ<input id="r-note-${id}" placeholder="例：渋谷→新宿"></label>
     </div>`;
   $('rows').appendChild(row);
   $('r-name-' + id).value = d.name || '';
@@ -371,7 +373,16 @@ function fitPaper() {
   $('frame-inner').style.transform = `scale(${scale})`;
   $('frame').style.height = Math.ceil($('paper').offsetHeight * scale) + 'px';
 }
+function markRequired() {
+  const first = document.querySelector('.row');
+  document.querySelectorAll('[data-required]').forEach(el => {
+    const row = el.closest('.row');
+    const empty = el.type === 'number' ? !(parseFloat(el.value) > 0) : !el.value.trim();
+    el.classList.toggle('need', empty && (!row || row === first));
+  });
+}
 function refresh() {
+  markRequired();
   const doc = readDoc();
   const shown = withSamples(doc);
   const errors = problems(doc);
